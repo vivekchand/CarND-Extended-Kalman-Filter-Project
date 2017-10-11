@@ -35,7 +35,7 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
   */
   // Recalculate x object state to rho, theta, rho_dot coordinates
   double rho = sqrt(x_(0)*x_(0) + x_(1)*x_(1));
-  double theta = atan(x_(1) / x_(0));
+  double theta = atan2(x_(1), x_(0));
   double rho_dot = (x_(0)*x_(2) + x_(1)*x_(3)) / rho;
   VectorXd h = VectorXd(3); // h(x_)
   h << rho, theta, rho_dot;

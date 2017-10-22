@@ -23,7 +23,8 @@ public:
   // measurement covariance matrix
   Eigen::MatrixXd R_;
 
-  /**
+
+    /**
    * Constructor
    */
   KalmanFilter();
@@ -70,6 +71,7 @@ public:
    */
    void KF(const Eigen::VectorXd &y);
 
+    void estimate(const Eigen::VectorXd &y, const Eigen::MatrixXd &K);
 };
 
 #endif /* KALMAN_FILTER_H_ */

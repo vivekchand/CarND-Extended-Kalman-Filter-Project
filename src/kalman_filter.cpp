@@ -33,10 +33,7 @@ void KalmanFilter::Update(const VectorXd &z) {
     MatrixXd K = PHt * Si;
 
     //new estimate
-    x_ = x_ + (K * y);
-    long x_size = x_.size();
-    MatrixXd I = MatrixXd::Identity(x_size, x_size);
-    P_ = (I - K * H_) * P_;
+    estimate(y, K);
 }
 
 void KalmanFilter::UpdateEKF(const VectorXd &z) {
@@ -44,15 +41,18 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
     double py = x_[1];
     double vx = x_[2];
     double vy = x_[3];
-
     double rho = sqrt(px * px + py * py);
     double phi = atan2(py, px);
     double rho_dot = (px * vx + py * vy) / rho;
 
     VectorXd z_pred(3);
     z_pred << rho, phi, rho_dot;
-
     VectorXd y = z - z_pred;
+    // resulting angle phi in the y vector should be adjusted so that it is between -pi and pi
+    double PI = atan(1)*4;
+    if( y[1] > PI ) y[1] -= 2*PI;
+    if( y[1] < -PI ) y[1] += 2*PI;
+
     MatrixXd Ht = H_.transpose();
     MatrixXd S = H_ * P_ * Ht + R_;
     MatrixXd Si = S.inverse();
@@ -60,6 +60,10 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
     MatrixXd K = PHt * Si;
 
     //new estimate
+    estimate(y, K);
+}
+
+void KalmanFilter::estimate(const VectorXd &y, const MatrixXd &K) {
     x_ = x_ + (K * y);
     long x_size = x_.size();
     MatrixXd I = MatrixXd::Identity(x_size, x_size);
